@@ -1,0 +1,136 @@
+---
+title: "Installation & Initial Configuration"
+description: "Step-by-step walkthrough to install Uwazi, configure essential server settings, and set up the environment for the first launch. Guides users across platforms (e.g. Unix/Mac/Windows) through dependency installs, configuration file creation, and option setup—helping ensure a smooth start."
+---
+
+## Installation & Initial Configuration
+
+This page guides you through installing Uwazi, configuring the essential server settings, and preparing your environment for the initial launch. It covers all major operating systems (Unix, Mac, Windows) and walks you through dependencies, configuration files, and options to ensure a smooth startup.
+
+---
+
+## Before You Begin
+
+Make sure you have the following prerequisites in place to avoid common setup failures:
+
+- **Supported OS:** Uwazi runs on Unix-based systems (Linux, macOS) and Windows.
+- **Node.js:** Version 16.x or later installed globally.
+- **Yarn package manager:** Required for dependency management.
+- **MongoDB:** A running instance (version 4.4 or higher) accessible by Uwazi.
+- **Access permissions:** Ability to install software and write files in the target directories.
+
+If you need detailed environment requirements, see [Prerequisites & System Requirements](/getting-started/uwazi-setup-essentials/prerequisites-system-requirements).
+
+---
+
+## Installing Uwazi
+
+The recommended way to install Uwazi is via cloning the repository and installing dependencies with Yarn.
+
+<Steps>
+<Step title="Clone the repository">
+Run the following to get the latest code:
+```bash
+git clone https://github.com/huridocs/uwazi.git
+cd uwazi
+```
+</Step>
+<Step title="Install dependencies">
+Install all necessary packages:
+```bash
+yarn install
+```
+</Step>
+<Step title="Build the project">
+Prepare source files for production:
+```bash
+yarn build
+```
+</Step>
+<Step title="Verify MongoDB connection">
+Make sure MongoDB is running and accessible (default is `mongodb://localhost:27017/uwazi`). This URL will be used in the configuration.
+</Step>
+</Steps>
+
+If you prefer Docker or another installation method, see alternative installation approaches in [Prerequisites & System Requirements](/getting-started/uwazi-setup-essentials/prerequisites-system-requirements).
+
+---
+
+## Configuring the Server
+
+Uwazi requires minimal but mandatory configuration before starting. This happens mainly through a JSON file, usually named `config.json`, placed in the root or a specific config directory.
+
+### Essential Configuration Keys
+
+- `mongodb.url`: The connection string for your MongoDB instance.
+- `server.port`: The port where Uwazi will listen (default 3000).
+- `publicAppUrl`: The base URL where your Uwazi instance will be accessed, including protocol (http/https).
+
+### Example Minimal `config.json`
+
+```json
+{
+  "mongodb": {
+    "url": "mongodb://localhost:27017/uwazi"
+  },
+  "server": {
+    "port": 3000
+  },
+  "publicAppUrl": "http://localhost:3000"
+}
+```
+
+Store this file in your working directory or specify its location via environment variables if running the server in production.
+
+<Tip>
+For advanced configuration options, including authentication methods and storage paths, see [Settings & Configuration Concepts](/overview/core_concepts/settings_and_configuration).
+</Tip>
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{"path": "config/default.json", "range": "1-35"}]} branch="main" />
+
+---
+
+## Running Uwazi for the First Time
+
+Once installed and configured, launch Uwazi to validate the setup and initialize the database.
+
+<Steps>
+<Step title="Start the server">
+Run:
+```bash
+yarn start
+```
+You should see output showing the server starting and connected to MongoDB.
+</Step>
+<Step title="Check server health">
+Open a browser and navigate to the `publicAppUrl` you configured (e.g., `http://localhost:3000`). You should see the Uwazi landing page.
+</Step>
+<Step title="Verify logs and connectivity">
+Watch the terminal for any errors:
+- Connection errors mean check your MongoDB URL.
+- Port conflicts require changing the `server.port`.
+</Step>
+</Steps>
+
+<Check>
+Successful launch looks like: "Server listening on port 3000" and "Connected to MongoDB at mongodb://localhost:27017/uwazi".
+</Check>
+
+<Warning>
+If the app fails to connect to MongoDB, confirm:
+- MongoDB service is running.
+- The connection string is correct and accessible.
+- Network/firewall settings allow communication.
+</Warning>
+
+---
+
+## Next Steps
+
+After a successful installation and initial launch, you can proceed to:
+
+- [First Run & Quick Validation](/getting-started/uwazi-setup-essentials/starting-validating-server) to test core features.
+- [Settings & Configuration Concepts](/overview/core_concepts/settings_and_configuration) for tuning your instance.
+- [Troubleshooting Common Setup Issues](/getting-started/uwazi-setup-essentials/troubleshooting-common-setup-issues) for help with errors.
+
+This page is the foundation for getting Uwazi up and running. Follow through to ensure a solid environment before customization or production deployment.
