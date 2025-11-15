@@ -1,0 +1,175 @@
+---
+title: "Settings APIs"
+description: "Reference for the endpoints that allow reading and updating application-wide settings. Gain insights into permission requirements, request formats, and best practices for configuring your Uwazi deployment via the API."
+---
+
+## Settings APIs Overview
+
+The Settings APIs let you programmatically read and update global application settings for your Uwazi deployment. These endpoints are your gateway to configuring system-wide behaviors, appearance, and integration options without manual changes via the UI or direct database access.
+
+Keep in mind these APIs control sensitive, application-wide properties, so permission requirements are strict, and changes affect all users immediately.
+
+## Authentication and Headers
+
+All requests to these endpoints require a valid authentication token with administrative privileges. Typically, this means using a Bearer token obtained through the Authentication APIs.
+
+Include these headers in your requests:
+
+- `Authorization: Bearer <your_token>`
+- `Content-Type: application/json`
+- `Accept: application/json`
+
+Example header block:
+
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...
+Content-Type: application/json
+Accept: application/json
+```
+
+Without the correct privileges, API calls will return a 403 Forbidden.
+
+## Core Endpoints
+
+Focus your integration on these main endpoints to read and update settings:
+
+### Get Current Settings
+Retrieve the full set of application settings.
+
+- **Method:** GET
+- **Path:** `/api/settings`
+
+**Example Request:**
+
+```http
+GET /api/settings HTTP/1.1
+Host: your-uwazi-instance.com
+Authorization: Bearer <token>
+Accept: application/json
+```
+
+**Successful Response Example:**
+```json
+{
+  "store": {
+    "features": {
+      "email": true,
+      "templates": {
+        "enabled": true
+      }
+    },
+    "ui": {
+      "language": "en",
+      "branding": {
+        "logo": "/public/logo.png"
+      }
+    }
+  }
+}
+```
+
+> The response delivers the whole configuration tree as stored internally. Only relevant or enabled settings will typically be present.
+
+### Update Application Settings
+Send updated settings to adjust the application's configuration.
+
+- **Method:** PUT
+- **Path:** `/api/settings`
+- **Content-Type:** `application/json`
+
+Only include keys you want to update; unspecified values remain untouched.
+
+**Payload example:**
+
+```json
+{
+  "store": {
+    "ui": {
+      "language": "es",
+      "branding": {
+        "logo": "/public/new-logo.png"
+      }
+    }
+  }
+}
+```
+
+**Example Request:**
+
+```http
+PUT /api/settings HTTP/1.1
+Host: your-uwazi-instance.com
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "store": {
+    "ui": {
+      "language": "es"
+    }
+  }
+}
+```
+
+**Successful Response:**
+- HTTP 200 OK
+- Returns the updated settings snapshot
+
+> Quick note: Some settings require server restart or cache clearing to take effect fully. Check the UI or logs for such indications.
+
+## Permission Requirements
+
+- Only users with the `admin` role or equivalent permissions can access these endpoints.
+- Attempts to read or update without sufficient permissions will result in a 403 Forbidden status.
+
+## Common Pitfalls and Best Practices
+
+- Always **fetch the current settings before updating** to avoid accidentally overwriting unrelated keys.
+- Send only the keys you intend to change to minimize side effects.
+- Use environment-specific tokens for different deployments to avoid confusion.
+- If you need to change sensitive fields such as authentication providers or system integrations, double-check your payload carefully.
+
+## Example Workflow for Updating UI Language
+
+1. **Get current settings:**
+
+```bash
+curl -X GET https://your-uwazi-instance.com/api/settings \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Accept: application/json'
+```
+
+2. **Modify the UI language in the response data to your preferred one, e.g., "fr" (French).**
+
+3. **PUT updated settings:**
+
+```bash
+curl -X PUT https://your-uwazi-instance.com/api/settings \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Content-Type: application/json' \
+  -d '{"store":{"ui":{"language":"fr"}}}'
+```
+
+4. **Verify response and test application UI language change.**
+
+## Error Handling & Responses
+
+- **401 Unauthorized:** Missing or invalid token.
+- **403 Forbidden:** Token valid but insufficient privileges.
+- **400 Bad Request:** Invalid payload format or invalid keys.
+
+Example error response:
+
+```json
+{
+  "message": "Forbidden",
+  "statusCode": 403
+}
+```
+
+## Related Resources
+
+- For details on authenticating and obtaining tokens, see [Authentication APIs](/api_reference/core_apis/authentication_apis).
+- Review [Authentication & Authorization](/overview/core_concepts/authentication_overview) for role management.
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{"path":"app/api/settings.ts","range":"10-45"}]} />

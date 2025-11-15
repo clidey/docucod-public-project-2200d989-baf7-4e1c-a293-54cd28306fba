@@ -1,0 +1,77 @@
+---
+title: "Authentication & Authorization"
+description: "Understand how Uwazi secures APIs using layered authentication strategies (basic and token), authorization checks, and middleware. Highlights major files and workflows involved in user authentication and permission management."
+---
+
+## How Uwazi Secures APIs with Authentication & Authorization
+
+When you’re working with Uwazi, one of the key concerns is ensuring that only the right users can access sensitive data or perform specific actions. This page explains how Uwazi protects its API endpoints using a multi-layered security approach—combining basic and token authentication, robust permission checks, and middleware that ties it all together. Understanding these layers helps you grasp how Uwazi keeps your data safe without sacrificing flexibility.
+
+## What Authentication & Authorization Mean in Uwazi
+
+At its core, **authentication** confirms ‘who you are’—usually by checking your credentials like username and password or token. **Authorization**, on the other hand, determines ‘what you can do’ by checking your permissions against the requested resource.
+
+Uwazi uses both concepts hand in hand to tightly control API access. This page is designed for developers, integrators, and maintainers who want to see the major flows and files involved when users log in, authenticate via tokens, and get authorized to perform actions on documents or settings.
+
+## How Authentication & Authorization Work Together
+
+Uwazi’s strategy is to verify identities early in the request lifecycle and then apply permission checks as requests move through middleware layers. This layered approach ensures both identity and intent are continually validated.
+
+Here’s the high-level flow:
+
+```mermaid
+flowchart TD
+  Request["Incoming API Request"] --> CheckAuth["Authentication Middleware"]
+  CheckAuth -->|Basic Auth| BasicVerify["Verify Credentials"]
+  CheckAuth -->|Token Auth| TokenVerify["Verify JWT Token"]
+  BasicVerify --> AuthSuccess["Authentication Successful"]
+  TokenVerify --> AuthSuccess
+  AuthSuccess --> Authorization["Authorization Checks"]
+  Authorization -->|Allowed| Proceed["Proceed to API Handler"]
+  Authorization -->|Denied| Deny["Access Denied Response"]
+  Deny --> End(["End Request"])
+  Proceed --> End
+```
+
+- **Basic and Token authentication** are supported to accommodate different client needs.
+- After identity verification, Uwazi uses **authorization middleware** to ensure the authenticated user has the right permissions for the API endpoint.
+
+This model avoids common pitfalls by separating concerns clearly and enabling easy extension or customization.
+
+## Seeing Authentication & Authorization in Action
+
+Imagine you’re integrating Uwazi into a custom frontend app. When a user attempts to fetch documents:
+
+- Your app includes a JWT token in the Authorization header.
+- The API’s authentication middleware validates the token against a secret key, confirming the user’s identity.
+- Then, the authorization layer checks if this user role is allowed to read documents.
+- Only if all checks pass does Uwazi return the requested data.
+
+Behind the scenes, the system uses middleware modules like `authenticateUser` and `authorizeAction` (commonly found in `api/middleware/authentication.js` and `api/middleware/authorization.js`) to enforce these rules consistently across the API. This way, you never worry about mixing authentication logic with your core API handlers.
+
+<Tip>
+Because Uwazi supports both basic and token-based authentication, you can choose the approach that best fits your environment, whether it’s a quick test with basic credentials or a secure production deployment using JWTs.
+</Tip>
+
+Quick example of token usage in a request header:
+
+```http
+GET /api/documents
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+You don’t need to handle token parsing or verification manually—the middleware takes care of that.
+
+## Next Steps: Setting Up & Extending Auth in Uwazi
+
+Getting started with authentication requires some initial setup:
+
+- Configuring secret keys and token timeouts.
+- Defining user roles and permissions in the configuration.
+- Implementing login flows that generate tokens.
+
+Want to dive deeper? Check out the [Authentication & Authorization Mechanisms](/api_reference/api_infrastructure/authentication_mechanisms) page for detailed API references and the [API Middleware & Rate Limiting](/api_reference/api_infrastructure/api_middleware_and_rate_limiting) page to learn how these processes hook into request handling.
+
+Together, these docs will help you customize authentication behavior or troubleshoot user access issues effectively.
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "api/middleware/authentication.js", "range": "1-100"},{"path": "api/middleware/authorization.js", "range": "1-80"}]} />

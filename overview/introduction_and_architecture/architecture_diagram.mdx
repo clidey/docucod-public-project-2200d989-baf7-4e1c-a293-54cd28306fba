@@ -1,0 +1,70 @@
+---
+title: "System Architecture"
+description: "Visualize the major server-side building blocks—API routes, authentication, settings, and middleware—and see how HTTP requests flow through them. Includes a mermaid diagram representing Uwazi’s Express-based architecture."
+---
+
+## Understanding Uwazi's System Architecture
+
+When you’re diving into Uwazi’s server side, it helps to see the big picture first — how all the components connect and handle each HTTP request flowing through the system. This page offers a clear, bird’s-eye view of those major building blocks like API routes, middleware, authentication, and settings, helping you understand their roles and interactions in the backend. Having this map is crucial for troubleshooting, customizing, or extending Uwazi’s core.
+
+## What This Page Shows and Who It's For
+
+This documentation focuses specifically on Uwazi’s server architecture, which is based on Express.js, a popular Node.js web framework. You’ll get a snapshot of how incoming HTTP requests make their way through various layers—from initial routing through authentication checks, settings application, and additional middleware—before reaching the core API logic.
+
+If you’re a developer or system administrator tasked with maintaining or tailoring Uwazi’s backend, this page will ground you in the essentials behind how the server is structured and reacts to requests. It’s also useful if you want to better understand how your configuration and authentication tie into the request flow.
+
+## A High-Level View of the Request Flow
+
+At its core, Uwazi’s server acts as a smart gatekeeper and coordinator. When a client sends an HTTP request, Express routes it based on the requested endpoint. Then, authentication middleware verifies who you are and what you can do, while settings middleware applies system-wide or tenant-specific configurations. These middleware layers ensure requests meet security and policy requirements before being handed to the business logic.
+
+Here’s a simplified flow to visualize:
+
+```mermaid
+flowchart TD
+  Client["HTTP Client\n(e.g., browser, API consumer)"] --> Router["Express Router\n(API Routes Dispatcher")
+  Router --> AuthMiddleware["Authentication Middleware\n(Verification & Authorization)"]
+  AuthMiddleware --> SettingsMiddleware["Settings Middleware\n(System & Tenant Config)"]
+  SettingsMiddleware --> MiddlewareChain["Additional Middlewares\n(e.g., logging, rate limiting)"]
+  MiddlewareChain --> APIHandlers["API Route Handlers\n(Core Business Logic)"]
+  APIHandlers --> Response["HTTP Response\n(Data, Status Codes)"]
+  Response --> Client
+
+  subgraph "Server Processing"
+    Router
+    AuthMiddleware
+    SettingsMiddleware
+    MiddlewareChain
+    APIHandlers
+  end
+```
+
+This flow shows how the server incrementally processes requests ensuring they’re authenticated, configured, and enriched with the right context before business logic executes. Responses then flow back through Express to the requester.
+
+## Seeing This Architecture in Action
+
+Imagine you want to fetch documents via Uwazi’s API. When your request hits `/api/documents`, it first lands on the Express router, which identifies it needs to go through authentication middleware. The middleware checks your credentials — if they’re valid and authorized, it proceeds. Next, settings middleware applies any configuration that affects the request (like localization or feature toggles).
+
+After passing these stages, the request reaches the document handler, which retrieves the requested data. The server then sends back a structured JSON response with the data or an error status if something went wrong.
+
+This layered approach means you can safely extend or customize each step without disrupting others — for example, adding a caching middleware between authentication and settings, or tweaking how settings are applied based on user roles.
+
+Here’s a small illustrative snippet on how middleware chains in Express function to create this flow:
+
+```javascript
+app.use(authMiddleware);    // checks authorization
+app.use(settingsMiddleware); // applies config per request
+app.use(additionalMiddleware); // logs, rate limits, etc.
+app.get('/api/documents', documentsHandler); // business logic
+```
+
+## Next Steps: Diving Deeper
+
+To get rolling with your own exploration or setup:
+
+- Check out [API Routing & Middleware Basics](/overview/core_concepts/api_and_middleware_basics) to learn more about how Express routes and middleware work in Uwazi.
+- Understand permissions and user roles in the [Authentication & Authorization](/overview/core_concepts/authentication_overview) section.
+- See how global and tenant settings influence behavior in [Settings & Configuration Concepts](/overview/core_concepts/settings_and_configuration).
+
+Starting here gives you the framework to navigate the rest of the documentation and system internals with confidence.
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "app/api/routes.js", "range": "1-100"},{"path": "app/api/middleware/authentication.js", "range": "5-65"}]} />

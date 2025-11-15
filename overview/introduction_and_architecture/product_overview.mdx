@@ -1,0 +1,56 @@
+---
+title: "What is Uwazi?"
+description: "Get familiar with Uwazi’s mission as an open-source backend platform. Learn its primary business value, who uses it, and the main workflows it enables—from secure authentication to document and settings management."
+---
+
+## Discovering Uwazi: Your Open-Source Backend Ally
+
+Imagine you need a flexible, secure platform to manage sensitive documents and user access without depending on proprietary tools. That's exactly where Uwazi shines. It's an open-source backend system designed for organizations aiming to handle authentication, document storage, and configuration with transparency and adaptability.
+
+Uwazi empowers you to build custom workflows for managing digital content and user permissions with ease—allowing you to focus on what matters: your data and its integrity. Whether you're a developer setting up a knowledge base or a project manager ensuring access control, Uwazi provides the foundational backend to make it happen smoothly.
+
+## What is Uwazi and Who Benefits from It?
+
+At its core, Uwazi is an open-source backend platform. It’s crafted to serve as the backbone for applications that need robust authentication, document processing, and settings management. Uwazi doesn’t tie you to a specific frontend, giving you the freedom to create your user interface or connect with other services.
+
+This platform is ideal for developers, system administrators, and organizations focused on building tailored document-centric applications. It fits especially well when you need secure user management and flexible resource handling without compromising on open standards or transparency.
+
+## The Inner Workings of Uwazi
+
+Uwazi organizes its features around three main pillars: authentication, document management, and settings configuration. These areas work together to give you control over who accesses your system, what information is stored, and how the system behaves.
+
+Think of Uwazi's architecture as a central hub receiving user credentials on one side, feeding document queries and updates through an efficient data store in the middle, and exposing configurable parameters for tuning the system’s behavior on the other end.
+
+This clear separation means you can confidently plug in your frontend or extend the backend functionalities without worrying about inherent bottlenecks.
+
+## Uwazi in Action: Real-World Scenarios
+
+Say you’re building a platform for a nonprofit organization managing case files and user roles. With Uwazi, you start by setting up secure authentication, so only authorized team members can log in. Next, you import or create documents directly via the backend API or through the integrated interface. Finally, you adjust settings to reflect your organization's workflows—for example, defining access restrictions or customizing metadata.
+
+Here’s a snippet illustrating how you might check user authentication status programmatically:
+
+```javascript
+fetch('/api/authenticated')
+  .then(response => response.json())
+  .then(data => {
+    if (data.authenticated) {
+      console.log('User is logged in');
+    } else {
+      console.log('User not authenticated');
+    }
+  });
+```
+
+As you scale, Uwazi continues to support your needs, from managing tens to thousands of documents, ensuring that both security and performance remain intact.
+
+## Starting Your Uwazi Journey
+
+Getting started with Uwazi hints at straightforward setup focused on your environment’s prerequisites, installing the backend, and running initial configuration commands. Once you have the system up and running, you can authenticate users, start uploading documents, and tweak system settings to fit your project goals.
+
+Be sure to check next steps like [Installation & Initial Configuration](/getting-started/uwazi-setup-essentials/installation-initial-configuration) and [Prerequisites & System Requirements](/getting-started/uwazi-setup-essentials/prerequisites-system-requirements) to ensure a smooth launch.
+
+<Tip>
+Quick note: Uwazi’s open-source nature means you have full control, but also full responsibility to configure and secure your installation according to your needs. Take advantage of the community and documentation to get the most out of it.
+</Tip>
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "app/api/authentication.js", "range": "10-50"}]} />

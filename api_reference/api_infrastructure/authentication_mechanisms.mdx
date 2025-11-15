@@ -1,0 +1,77 @@
+---
+title: "Authentication & Authorization Mechanisms"
+description: "An in-depth look at Uwazi's authentication system, including supported strategies (basic, token), user permission checks, and integrating with middleware for endpoint protection. Understand how API security is enforced and how to troubleshoot access issues."
+---
+
+## Authentication & Authorization Mechanisms in Uwazi
+
+Uwazi secures its API and user access through a combination of authentication strategies and fine-grained authorization checks. This page guides you through how Uwazi expects you to authenticate your requests, how permission enforcement works, and how to leverage middleware to protect API endpoints effectively.
+
+### How Uwazi Handles Authentication
+
+Uwazi supports multiple authentication methods tailored for different integration and security needs:
+
+- **Basic Authentication:** Uses standard HTTP Basic Auth headers with username and password.
+- **Token Authentication:** Uses bearer tokens for stateless authentication.
+
+These methods allow Uwazi to confirm your identity before granting access to any protected resources.
+
+#### Example: Token Authentication Header
+
+When calling the API with a token, include the `Authorization` header as follows:
+
+```http
+Authorization: Bearer your_access_token_here
+Content-Type: application/json
+```
+
+### Enforcing User Permissions
+
+Once authenticated, Uwazi performs permission checks against the authenticated user’s roles and assigned rights:
+
+- Permissions are tied to API endpoints and specific actions (e.g., read, write, delete).
+- The system verifies that the user has the minimum scope required for the requested operation.
+- Unauthorized or forbidden attempts return appropriate HTTP status codes (401 or 403).
+
+This ensures that only users granted explicit access can operate on resources.
+
+### Integrating Authentication Middleware
+
+Uwazi uses middleware components to integrate authentication and authorization seamlessly into the API request lifecycle:
+
+- Middleware intercepts requests early, validates credentials, and rejects invalid ones.
+- It populates request context with authenticated user info for downstream handlers.
+- Permission checks happen post-authentication before executing business logic.
+
+#### Using Middleware to Protect an Endpoint
+
+Here’s a typical example in an Express.js style setup illustrating how the authentication middleware is applied:
+
+```javascript
+const express = require('express');
+const app = express();
+const { authenticationMiddleware, authorizationMiddleware } = require('./middleware/auth');
+
+// Protect this route for authenticated users with 'read' permission on documents
+app.get('/api/documents', authenticationMiddleware, authorizationMiddleware('document:read'), (req, res) => {
+  // Your logic to fetch documents
+  res.json({ documents: [] });
+});
+```
+
+### Troubleshooting Common Access Problems
+
+If you run into problems accessing Uwazi APIs, consider these points:
+
+- **Invalid or Missing Token:** Ensure your token is valid, not expired, and included in the `Authorization` header.
+- **Insufficient Permissions:** Check if your user role includes the permissions needed for the API call.
+- **Expired Sessions:** Tokens and sessions can expire—request a fresh token or reauthenticate.
+- **Incorrect Authentication Method:** Confirm you are using the right auth strategy for the endpoint.
+
+Use API responses and HTTP status codes as guides; 401 means authentication failed, 403 means you are authenticated but lack permission.
+
+---
+
+For more details on authentication strategies, see [Authentication APIs](/api_reference/core_apis/authentication_apis). To understand how settings affect authorization, check [Settings & Configuration Concepts](/overview/core_concepts/settings_and_configuration).
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{"path": "app/api/middleware/authentication.ts", "range": "10-70"},{"path": "app/api/middleware/authorization.ts", "range": "5-50"}]} />

@@ -1,0 +1,113 @@
+---
+title: "Troubleshooting Common Setup Issues"
+description: "A quick guide to recognizing and resolving the most common setup and startup errors encountered by new users, such as dependency issues, port conflicts, or configuration mistakes. Practical tips help users resolve blockers and achieve a working environment."
+---
+
+## Troubleshooting Common Setup Issues
+
+Getting Uwazi up and running smoothly often involves resolving a handful of common setup errors. This guide helps you quickly identify what went wrong during installation or startup—like missing dependencies, port conflicts, or configuration mistakes—and shows you how to fix them so you can have a working environment fast.
+
+### Identifying Dependency Issues
+
+Uwazi relies on several system tools and Node.js packages. If dependencies aren’t correctly installed, the server won’t start or crashes unexpectedly.
+
+Common signs of dependency problems include:
+
+- Errors mentioning missing modules (e.g., "module not found")
+- npm or yarn installation failures
+- Crashes referencing incompatible Node.js or MongoDB versions
+
+To fix these:
+
+- Ensure you’re running Node.js version 16.x or higher. Use `node -v` to check.
+- Verify that MongoDB server is installed and running with the correct version (4.4+ recommended).
+- Run `npm install` or `yarn install` inside the Uwazi directory to install all required packages.
+- Clear your `node_modules` folder and reinstall if dependencies seem corrupted:
+
+```bash
+rm -rf node_modules
+yarn install
+```
+
+<Tip>Dependency issues often arise from mixing package managers or partial installs. Stick to one (yarn is preferred) and clean installs when in doubt.</Tip>
+
+### Resolving Port Conflicts
+
+By default, Uwazi runs on port 3000. If you see errors like "EADDRINUSE: address already in use," the port is busy.
+
+To resolve this:
+
+- Identify the process using port 3000:
+
+```bash
+lsof -i :3000
+```
+
+- Stop the conflicting process:
+
+```bash
+kill -9 <PID>
+```
+
+- Alternatively, change Uwazi’s port by setting the `PORT` environment variable before starting:
+
+```bash
+PORT=4000 yarn start
+```
+
+<Tip>On Windows, use `netstat -ano | findstr :3000` and then `taskkill /PID <PID> /F`.
+
+### Correcting Configuration Mistakes
+
+Misconfigured environment variables or missing configuration files can prevent startup.
+
+Check the following:
+
+- Your `.env` file exists and contains required keys such as `MONGODB_URI`.
+- The MongoDB URI is correct and reachable.
+- If using custom settings, confirm syntax and value correctness.
+
+Example minimal `.env`:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/uwazi
+PORT=3000
+```
+
+If Uwazi fails on startup with configuration errors, examine logs for missing or malformed keys.
+
+### Verifying Successful Startup
+
+After fixing issues, start the server:
+
+```bash
+yarn start
+```
+
+You should see output similar to:
+
+```plain
+> uwazi@ start
+> node server.js
+
+Server running on http://localhost:3000
+```
+
+Open your browser at that URL. If you see the Uwazi login or welcome screen, the setup is successful.
+
+<Tip>If you don’t see this after fixing problems, check logs for residual errors and re-verify dependency versions.</Tip>
+
+### Common Pitfalls
+
+- Running installation or startup commands outside the project root
+- Using unsupported Node.js or MongoDB versions
+- Failing to start MongoDB server before Uwazi
+- Leaving old environment variables cached in your shell session
+
+Restart your terminal after changing environment variables or reinstalling software to avoid these.
+
+---
+
+For more detailed setup instructions, see [Installation & Initial Configuration](/getting-started/uwazi-setup-essentials/installation-initial-configuration) and [First Run & Quick Validation](/getting-started/uwazi-setup-essentials/starting-validating-server). For architecture context, visit the [System Architecture](/overview/introduction_and_architecture/architecture_diagram) page.
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "README.md", "range": "5-45"},{"path": "package.json", "range": "1-20"}]} />

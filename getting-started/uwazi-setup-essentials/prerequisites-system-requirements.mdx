@@ -1,0 +1,75 @@
+---
+title: "Prerequisites & System Requirements"
+description: "Learn what hardware, software, and environment requirements are necessary to successfully install and run the Uwazi backend. Covers required versions for Node.js, npm, and any other dependencies, so users can prep their system with confidence."
+---
+
+## Prerequisites & System Requirements
+
+Before installing and running the Uwazi backend, ensure your environment meets the necessary hardware and software requirements. This preparation avoids common setup issues and ensures smooth operation.
+
+### Supported Hardware
+
+Uwazi’s backend is designed to run on standard server hardware or cloud instances. To guarantee acceptable performance:
+
+- Use a machine with at least 2 CPU cores.
+- Allocate a minimum of 4 GB of RAM; 8 GB recommended for larger datasets.
+- Ensure sufficient disk space for the document storage and indexes, at least 10 GB free.
+- Network connectivity must allow inbound and outbound traffic on the configured ports.
+
+### Software Requirements
+
+The Uwazi backend depends on specific versions of language runtimes and package managers:
+
+- **Node.js**: Version 18.x (LTS) is required. Earlier or later versions are not officially supported and may cause runtime errors.
+- **npm**: Bundled with Node.js 18.x; ensure it is at least version 8.x.
+- **Database**: A running instance of MongoDB 6.x or compatible is needed. The database must be accessible and configured for the app.
+
+> Quick check: Run `node -v` and `npm -v` in your terminal to verify installed versions.
+
+### Environment & Permissions
+
+Uwazi runs in Node.js and requires proper environment setup:
+
+- The user running Uwazi needs read/write access to the filesystem paths where Uwazi stores uploaded files and indexes.
+- Environment variables such as `MONGO_URL` must be set correctly for database connection.
+- Ports (default 3000 for HTTP) need to be open and not blocked by firewalls.
+- On Linux servers, consider setting up process supervision (e.g., systemd) for stable uptime.
+
+### Operating System Support
+
+- Uwazi backend supports modern Linux distributions (Ubuntu 22.04 LTS recommended).
+- MacOS and Windows can be used for development or testing but are not recommended for production.
+
+### Common Setup Pitfalls
+
+- Using unsupported Node.js or MongoDB versions causes start-up failures.
+- Insufficient memory may cause unexpected crashes.
+- File permission issues often lead to failures loading or saving documents.
+
+<Tip>
+Always confirm your environment versions with `node -v` and `mongod --version` before proceeding with installation. This saves troubleshooting time later.
+</Tip>
+
+### Verify Your Setup
+
+After preparing your environment, quickly verify with these commands:
+
+```bash
+node -v  # Expected output: v18.x.x
+npm -v   # Expected output: 8.x.x or higher
+mongod --version  # Expected output: 6.x.x
+```
+
+If these commands fail or show incompatible versions, adjust your environment accordingly.
+
+<Check>
+Check that the directories for uploads and indexes are writable by the Uwazi user to avoid runtime errors.
+</Check>
+
+### Where to Go Next
+
+Once your system matches these prerequisites, proceed to [Installation & Initial Configuration](/getting-started/uwazi-setup-essentials/installation-initial-configuration) to get Uwazi up and running quickly.
+
+To troubleshoot version or environment issues during setup, visit [Troubleshooting Common Setup Issues](/getting-started/uwazi-setup-essentials/troubleshooting-common-setup-issues).
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "server/package.json", "range": "1-50"}]} />

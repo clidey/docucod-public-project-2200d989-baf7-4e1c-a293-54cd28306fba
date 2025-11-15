@@ -1,0 +1,62 @@
+---
+title: "Settings & Configuration Concepts"
+description: "Explore how system settings are managed via dedicated endpoints and controllers. Clarifies core concepts like settings validation, update flows, and permission enforcement."
+---
+
+## Managing System Settings in Uwazi
+
+When you're customizing Uwazi to fit your organization's needs, managing system settings becomes a central task. This page guides you through how settings are handled within the system—covering how you update them, how the app keeps things consistent, and how permissions shape what you can do. Understanding this helps you confidently adjust configurations without unexpected side effects.
+
+## What Settings Are and Who Controls Them
+
+Settings in Uwazi are centralized preferences and configuration values that control various application aspects, such as interface behavior, feature flags, or integration details. These settings are managed through dedicated API endpoints and handled inside well-defined controllers designed to keep operations secure and predictable.
+
+This section is ideal for administrators and developers who need to understand the lifecycle of system settings: how to validate, update, and enforce permissions around them. If you are working on customizing Uwazi or integrating external services that require configuration, knowing these concepts will save you time and headaches.
+
+## How Settings Management Works
+
+At its core, the system settings flow revolves around a straightforward cycle:
+
+- **Retrieve current settings:** Users or systems fetch existing configuration via a GET endpoint.
+- **Validate changes:** Before accepting updates, submitted settings go through validation to ensure values are correct, consistent, and safe.
+- **Apply permission checks:** Only authorized users with correct permissions can make modifications.
+- **Persist updates:** Validated and permitted changes are saved securely.
+
+Behind the scenes, this flow is orchestrated by settings controllers responding to RESTful API requests. These controllers ensure every request complies with enforced rules to maintain system integrity.
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{"path": "app/api/settings/controller.js", "range": "10-75"}]} />
+
+## Putting Settings into Practice
+
+Imagine you want to change the default language of your Uwazi instance or adjust document upload limits. When you submit these changes, the system first validates that the language code is supported or that the upload size adheres to defined constraints. Then, it verifies your user role to confirm you have admin rights to make these modifications.
+
+If validation fails—say, your language code is misspelled—the system rejects the request and returns helpful error messages, guiding you to fix the input. This mechanism prevents partial or incorrect settings from disrupting the entire application.
+
+In the UI, these setting changes might be exposed as forms or configuration panels that interact with the underlying API transparently, making it easy for admins to tailor the system without touching code. For example, updating the `siteName` setting via an API call would look like:
+
+```json
+{
+  "siteName": "My Custom Uwazi Instance"
+}
+```
+
+The server will check permissions, validate the field, and update if everything passes.
+
+This safeguards your deployments and ensures that essential parameters remain accurate and authorized.
+
+## Best Practices and Tips for Working with Settings
+
+- Always review the error messages when an update fails; they often pinpoint exactly what's wrong.
+- Use the existing API endpoints to make changes rather than editing configuration files directly; this ensures validation and security are applied.
+- Confirm that your user role includes the necessary permissions for modifying settings to avoid unnecessary frustration.
+- When developing custom integrations that rely on settings, test validation thoroughly to handle edge cases gracefully.
+
+## Where to Go Next
+
+Now that you understand how settings flow through Uwazi—from validation to updates and permissions—you're ready to dive into actual implementation. To get started, head over to the [Installation & Initial Configuration](/getting-started/uwazi-setup-essentials/installation-initial-configuration) page for setup guidance or explore [Authentication & Authorization](/overview/core_concepts/authentication_overview) to better grasp permission enforcement.
+
+For more detailed technical insights into how middleware assists these processes, check out the [API Routing & Middleware Basics](/overview/core_concepts/api_and_middleware_basics) documentation.
+
+<Tip>
+Managing settings through the API not only keeps your system secure but also enables automation and integration, making your Uwazi instance more flexible and powerful.
+</Tip>
