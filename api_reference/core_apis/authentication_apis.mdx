@@ -1,0 +1,146 @@
+---
+title: "Authentication APIs"
+description: "Learn how to authenticate with the Uwazi API, including login, logout, and token management endpoints. This page covers authentication flows, required credentials, typical request and response formats, and error scenarios to ensure secure programmatic access."
+---
+
+## Authentication APIs
+
+The Authentication APIs provide the tools you need to securely access Uwazi programmatically. This includes endpoints for logging in, logging out, and managing your authentication tokens. These APIs ensure your integration can authenticate users safely, maintain session integrity, and handle authorization tokens properly.
+
+### How Authentication Works
+
+You authenticate by exchanging user credentials for a JSON Web Token (JWT), which you then include in the Authorization header for subsequent requests. Tokens have an expiry and must be refreshed by logging in again (there is no refresh token mechanism).
+
+### Key Endpoints
+
+Here are the main endpoints you'll interact with to manage authentication:
+
+| Endpoint             | Method | Purpose                    |
+|----------------------|--------|----------------------------|
+| `/api/auth/login`    | POST   | Login and receive a token  |
+| `/api/auth/logout`   | POST   | Invalidate the current token |
+
+#### Login: `/api/auth/login`
+
+Use this endpoint to authenticate a user and obtain a JWT.
+
+**Request:**
+```json
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user@example.com",
+  "password": "yourPassword"
+}
+```
+
+- **username**: User’s login identifier (usually email).
+- **password**: User’s password.
+
+**Response (Success):**
+```json
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR...",
+  "expiresIn": 3600
+}
+```
+- **token**: Your JWT to use in Authorization header.
+- **expiresIn**: Number of seconds until the token expires.
+
+**Common error:**
+```json
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "error": "Invalid username or password"
+}
+```
+
+#### Logout: `/api/auth/logout`
+
+This endpoint invalidates the current token on the server side.
+
+**Request:**
+```http
+POST /api/auth/logout
+Authorization: Bearer <your_token_here>
+```
+
+**Response (Success):**
+```http
+HTTP/1.1 204 No Content
+```
+
+No payload is returned; the token is invalidated.
+
+### Authentication Header
+
+Use the token returned from login in all protected API requests by including the header:
+
+```
+Authorization: Bearer <token>
+```
+
+Failing to provide a valid token will result in **401 Unauthorized** responses.
+
+### Common Pitfalls
+
+- Tokens expire based on **expiresIn**. You must re-authenticate after expiration.
+- There is no refresh token endpoint; your app should handle login again.
+- Always use HTTPS to protect credentials and tokens in transit.
+- The logout endpoint only invalidates tokens on the server side; the client should also discard the token.
+
+### Example Authentication Flow
+
+<Steps>
+<Step title="Authenticate User">
+Send user credentials to `/api/auth/login` and obtain JWT.
+</Step>
+<Step title="Use Token">
+Include JWT in the `Authorization` header for all subsequent API requests.
+</Step>
+<Step title="Handle Expiration">
+When token expires, prompt user to log in again and obtain a new token.
+</Step>
+<Step title="Logout">
+Call `/api/auth/logout` to invalidate the token when user logs out.
+</Step>
+</Steps>
+
+### Troubleshooting
+
+<AccordionGroup title="Authentication Troubleshooting">
+<Accordion title="Invalid Credentials Error">
+Make sure your username and password are correct. Remember usernames are case-sensitive. If you repeatedly get 401 errors, verify credentials or reset your password if necessary.
+</Accordion>
+<Accordion title="Token Expired Error">
+Tokens include an expiry. If you see 401 Unauthorized after a period of time, it’s likely the token expired. Request a new token by authenticating again.
+</Accordion>
+<Accordion title="Missing Authorization Header">
+If an endpoint returns 401 Unauthorized and you believe your token is valid, verify your request includes the header:
+
+```
+Authorization: Bearer <token>
+```
+
+Ensure no typos or whitespace errors.
+</Accordion>
+</AccordionGroup>
+
+
+### Security Considerations
+
+- Always transmit authentication requests over HTTPS.
+- Store tokens securely on the client side, avoiding exposure in logs or URLs.
+- Regularly refresh tokens by prompting for re-login to minimize risk.
+
+---
+
+For a broader understanding of how authentication fits into Uwazi, check out the [Authentication & Authorization overview](/overview/core_concepts/authentication_overview).
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "app/api/controllers/authentication.js", "range": "1-120"}]} />
