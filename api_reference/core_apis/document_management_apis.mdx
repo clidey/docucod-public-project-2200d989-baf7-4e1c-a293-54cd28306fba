@@ -1,0 +1,188 @@
+---
+title: "Document Management APIs"
+description: "Explore the endpoints for managing documents, including querying, access control, and request lifecycle. Discover accepted parameters, permissions handling, and behavioral details for interacting with Uwazi's document resources."
+---
+
+## Document Management APIs
+
+Uwazi's Document Management APIs let you interact with your document data programmatically—browse, create, update, delete, and control access within your repository. This set of endpoints is designed for developers who want to integrate document workflows efficiently, respecting permissions and lifecycle rules embedded in Uwazi.
+
+These APIs handle everything from querying your documents with filters, to managing access rights, and ensuring your operations reflect the actual allowed user context.
+
+---
+
+### How to Use the Document APIs
+
+You'll mostly work with these core endpoints. They cover the primary document lifecycle actions and access controls:
+
+- **GET /api/documents** — Retrieve lists of documents with optional filters.
+- **GET /api/documents/{id}** — Fetch a specific document by its ID.
+- **POST /api/documents** — Create a new document.
+- **PUT /api/documents/{id}** — Update an existing document.
+- **DELETE /api/documents/{id}** — Remove a document.
+
+Each request must consider user permissions embedded via authentication (see [Authentication APIs](/api_reference/core_apis/authentication_apis)). Unauthorized or insufficient-access attempts will return standard HTTP 403/401 responses.
+
+
+### Querying Documents
+
+Start by fetching documents with filters to narrow down results. The **GET /api/documents** endpoint supports:
+
+- `query`: A full-text search string.
+- `filters`: Field-specific filters (e.g., `{"type": "report", "date>": "2020-01-01"}`).
+- `limit` and `skip`: Control pagination.
+- `sort`: Define ordering by fields (e.g., `"date:desc"`).
+
+Example request:
+```http
+GET /api/documents?query=climate&limit=10&sort=date:desc HTTP/1.1
+Authorization: Bearer yourAccessToken
+Accept: application/json
+```
+
+Typical JSON response snippet:
+```json
+{
+  "total": 42,
+  "rows": [
+    {
+      "_id": "123abc",
+      "title": "Climate Report 2023",
+      "type": "report",
+      "date": "2023-03-15"
+    },
+    ...
+  ]
+}
+```
+
+##### Quick Tip:
+- Filters override the full-text query, so use them to restrict the dataset precisely.
+- Pagination defaults to 50 items per request if not specified.
+
+### Managing Individual Documents
+
+#### Fetching a Document
+
+Retrieve complete document data by ID with
+
+```http
+GET /api/documents/{id}
+```
+Replace `{id}` with the document's unique identifier.
+
+If the document doesn't exist or you lack permission, you'll get a 404 or 403 response.
+
+#### Creating Documents
+
+To add a document, send a POST with a JSON body including key fields:
+
+```http
+POST /api/documents
+Content-Type: application/json
+Authorization: Bearer yourAccessToken
+
+{
+  "title": "New Document",
+  "type": "report",
+  "metadata": {
+    "date": "2024-05-25",
+    "author": "Jane Doe"
+  },
+  "attachments": []
+}
+```
+
+You can omit optional fields like `attachments` if none exist.
+
+Validations are enforced server-side. Missing required fields or invalid data types return errors with details.
+
+#### Updating Documents
+
+Update an existing document using PUT, providing only the fields you want changed:
+
+```http
+PUT /api/documents/123abc
+Content-Type: application/json
+Authorization: Bearer yourAccessToken
+
+{
+  "title": "Updated Title"
+}
+```
+
+The entire document is replaced with the payload, so include all fields you want preserved.
+
+#### Deleting Documents
+
+Removing a document requires a DELETE request:
+
+```http
+DELETE /api/documents/123abc
+Authorization: Bearer yourAccessToken
+```
+
+This operation is irreversible and permission-restricted.
+
+### Access Control and Permissions
+
+Uwazi enforces permissions at every API interaction. Your access token scopes dictate what documents you can view or modify. Attempting forbidden actions results in 403 Forbidden responses.
+
+The platform supports **role-based permissions** that affect visibility and edit rights on a per-document basis.
+
+### Common Parameters Across Endpoints
+
+- `Authorization` header with a valid bearer token is **mandatory**.
+- `Content-Type: application/json` for POST/PUT operations.
+- Query parameters for filtering, paging, and sorting on GET requests.
+
+### Error Handling
+
+Errors are returned in JSON with an `error` object containing:
+
+- `message`: A brief human-readable message.
+- `code`: An HTTP status code.
+
+Example error response:
+
+```json
+{
+  "error": {
+    "message": "Document not found",
+    "code": 404
+  }
+}
+```
+
+### Pagination Behavior
+
+GET endpoints that list documents return a standard structure:
+
+- `total`: Total number of items matching the query.
+- `rows`: Array of document records for the requested page.
+
+Use `limit` and `skip` parameters to page through results.
+
+---
+
+### Example Workflow
+
+You want to automate syncing new reports from your local system into Uwazi:
+
+1. Search existing documents with `type=report` and `date>lastSyncDate`.
+2. Upload new documents as JSON via POST `/api/documents`.
+3. Update document details if metadata changes using PUT.
+4. Handle permission errors gracefully by monitoring 403 responses.
+
+This flow ensures your external data is reflected in Uwazi without duplicate entries and with controlled access.
+
+### Where to Go from Here
+
+- For authentication details and how to obtain a valid token, see [Authentication APIs](/api_reference/core_apis/authentication_apis).
+- To understand global API behavior like rate limiting and error codes, check [Error Handling & Status Codes](/api_reference/api_infrastructure/errors_and_status_codes).
+
+<Tip>
+Always test your requests with real tokens and data in a safe environment before using in production.
+</Tip>
+
+<Source url="https://github.com/huridocs/uwazi" branch="main" paths={[{"path": "app/api/documents.js", "range": "1-120"}]} />
