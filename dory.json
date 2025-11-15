@@ -1,0 +1,88 @@
+{
+  "background": {
+    "decoration": "gradient"
+  },
+  "colors": {
+    "dark": "#1E3A8A",
+    "light": "#60A5FA",
+    "primary": "#60A5FA"
+  },
+  "favicon": "/favicon.svg",
+  "fonts": {
+    "family": "Montserrat",
+    "format": "woff2",
+    "source": "https://fonts.gstatic.com/s/googlesansflex/v5/t5sJIQcYNIWbFgDgAAzZ34auoVyXkJCOvp3SFWJbN5hF8Ju1x6sKCyp0l9sI40swNJwGpVd4AZzz0v6lJ4qFXNZhGjLvDSkV4USKMo6qQzwliVdHAy9jxTDHg_ugnAakpwGc-cxgUqDCIUI.woff2"
+  },
+  "icons": {
+    "library": "fontawesome"
+  },
+  "logo": {
+    "dark": "./logo/logo.svg",
+    "light": "./logo/logo.svg"
+  },
+  "name": "Uwazi API Server",
+  "navigation": {
+    "tabs": [
+      {
+        "groups": [
+          {
+            "group": "Introduction \u0026 Architecture",
+            "pages": [
+              "overview/introduction_and_architecture/product_overview",
+              "overview/introduction_and_architecture/architecture_diagram",
+              "overview/introduction_and_architecture/integration_points"
+            ]
+          },
+          {
+            "group": "Core Concepts \u0026 Terminology",
+            "pages": [
+              "overview/core_concepts/authentication_overview",
+              "overview/core_concepts/settings_and_configuration",
+              "overview/core_concepts/api_and_middleware_basics"
+            ]
+          }
+        ],
+        "tab": "Overview"
+      },
+      {
+        "groups": [
+          {
+            "group": "Uwazi Setup Essentials",
+            "pages": [
+              "getting-started/uwazi-setup-essentials/prerequisites-system-requirements",
+              "getting-started/uwazi-setup-essentials/installation-initial-configuration",
+              "getting-started/uwazi-setup-essentials/starting-validating-server",
+              "getting-started/uwazi-setup-essentials/troubleshooting-common-setup-issues"
+            ]
+          }
+        ],
+        "tab": "Getting Started"
+      },
+      {
+        "groups": [
+          {
+            "group": "Core API Endpoints",
+            "pages": [
+              "api_reference/core_apis/authentication_apis",
+              "api_reference/core_apis/document_management_apis",
+              "api_reference/core_apis/settings_apis"
+            ]
+          },
+          {
+            "group": "Authentication, Middleware \u0026 Error Handling",
+            "pages": [
+              "api_reference/api_infrastructure/authentication_mechanisms",
+              "api_reference/api_infrastructure/api_middleware_and_rate_limiting",
+              "api_reference/api_infrastructure/errors_and_status_codes"
+            ]
+          }
+        ],
+        "tab": "API Reference"
+      }
+    ]
+  },
+  "styling": {
+    "codeblocks": "dark",
+    "eyebrows": "breadcrumbs"
+  }
+}
