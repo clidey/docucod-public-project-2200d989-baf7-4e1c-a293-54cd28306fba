@@ -1,0 +1,109 @@
+---
+title: "API Middleware & Rate Limiting"
+description: "Details on the middleware pipeline for the API, including logging, request handling, and rate limiting behaviors. Learn how requests are processed and how to handle or customize rate limiting and throttling responses as a client."
+---
+
+# API Middleware & Rate Limiting
+
+This page explains how the API processes incoming requests using middleware, including logging, request handling, and rate limiting. Understanding this flow helps you anticipate responses, handle throttling gracefully, and customize your client integration accordingly.
+
+## How Requests Flow Through Middleware
+
+Every API request passes through a pipeline of middleware layers. Each layer inspects or modifies the request before passing it on, or returns a response early if a condition requires it.
+
+Key middleware behaviors involved:
+
+- **Logging:** Incoming requests and outgoing responses are logged for monitoring and debugging.
+- **Authentication & Authorization:** Middleware checks user credentials and permissions before proceeding.
+- **Rate Limiting:** Protects the API from excessive or abusive requests by limiting request rates.
+- **Error Handling:** Middleware catches unhandled errors and formats the API error responses consistently.
+
+Middleware works in order, so rate limiting happens after auth but before the main request handler.
+
+## Rate Limiting Details
+
+Rate limiting controls how many requests a client can make within a certain timeframe to ensure stable service. Here’s what you need to know:
+
+- **Limit Scope:** Rate limits apply per user or API key, depending on authentication context.
+- **Limits:** The exact number of allowed requests and window duration are configured server-side and may change.
+- **Response Codes:** When exceeded, the API returns HTTP 429 (Too Many Requests).
+- **Headers:** The response includes these helpful headers:
+  - `X-RateLimit-Limit`: total allowed requests in the current window
+  - `X-RateLimit-Remaining`: remaining requests before throttling triggers
+  - `X-RateLimit-Reset`: UNIX timestamp when the limit resets
+
+### Handling Rate Limiting on the Client Side
+
+To avoid interruptions:
+
+- Monitor `X-RateLimit-Remaining` in every response.
+- Implement retry logic with backoff when receiving 429 responses.
+- Respect the `X-RateLimit-Reset` to know when to resume sending requests.
+
+<Tip>
+The API does not queue or delay requests for you. If you send too many requests too fast, you must handle 429 responses yourself.
+</Tip>
+
+## Customizing and Extending Middleware
+
+While most users interact with the API as clients and cannot change middleware behavior, if you’re running your own instance or extending the platform:
+
+- Middleware components are modular and can be customized or extended.
+- Rate limits can be adjusted via server configuration files.
+- You can add additional middleware layers to log more details or implement custom throttling.
+
+If you control the API server, this provides flexibility to tailor request handling to your application’s scale and policy.
+
+## Common Pitfalls and Troubleshooting
+
+Watch out for these common issues:
+
+- **Unexpected 429 Errors:** Check if your client is flooding the API unintentionally. Rate limits reset periodically.
+- **Missing Rate Limit Headers:** Some non-standard or internal endpoints may not include rate limit headers.
+- **Delays due to Network or Proxy Caches:** Middleware logging and rate limits occur at the server, but intermediate caching or proxies can affect response timing.
+
+If you suspect middleware issues or want to verify behavior:
+
+- Enable detailed logging on your API client to monitor headers and response codes.
+- Request access to server logs (if available) for audit.
+
+## Quick Reference Examples
+
+### Sample Request With Rate Limit Headers
+
+```http
+GET /api/documents HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+
+--- Response ---
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 752
+X-RateLimit-Reset: 1685712000
+
+{ "data": [...document objects...] }
+```
+
+### Handling a 429 Response
+
+```http
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1685712600
+
+{
+  "error": "Rate limit exceeded. Try again later."
+}
+```
+
+Your client should read `X-RateLimit-Reset`, wait until that timestamp, then resume requests.
+
+---
+
+For more on authentication and error handling, check out the related pages [Authentication & Authorization Mechanisms](/api_reference/api_infrastructure/authentication_mechanisms) and [Error Handling & Status Codes](/api_reference/api_infrastructure/errors_and_status_codes).
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{path:"app/api/middleware/rateLimiter.ts",range:"1-45"},{path:"app/api/middleware/index.ts",range:"20-60"}]} />
