@@ -1,0 +1,108 @@
+---
+title: "First Run & Quick Validation"
+description: "Instructions to start the Uwazi server and verify it’s running successfully. Covers basic launch commands, what successful output looks like, and simple validation steps to check basic API/server responsiveness."
+---
+
+# Starting Uwazi and Verifying Server Health
+
+This guide helps you launch the Uwazi server for the first time and confirm that it’s running correctly. You’ll learn the basic commands to start the server, identify what a successful startup looks like in the output, and quickly validate the server’s responsiveness through simple API checks.
+
+## Prerequisites Before Launch
+
+Make sure you’ve completed the installation and initial configuration steps first. At minimum, you need:
+
+- Uwazi installed and dependencies available (Node.js, MongoDB, etc.).
+- Appropriate environment variables or configuration files set up (e.g., database URLs, port settings).
+- Terminal access with permissions to run commands.
+
+If you haven’t installed the server yet, see [Installation & Initial Configuration](/getting-started/uwazi-setup-essentials/installation-initial-configuration).
+
+## Launching the Uwazi Server
+
+Starting the Uwazi server is straightforward using the main server start command. This command boots the server on the configured port and connects to its database.
+
+<Steps>
+<Step title="Navigate to Uwazi root directory">
+Change to the directory where Uwazi is installed:
+
+```bash
+cd your_uwazi_installation_directory
+```
+</Step>
+<Step title="Run the startup command">
+Start the server with:
+
+```bash
+npm start
+```
+
+or if you use Yarn:
+
+```bash
+yarn start
+```
+
+This command launches the server based on the run configuration defined in `package.json`.
+</Step>
+<Step title="Watch for startup output">
+You should see log lines confirming:
+
+- Initialization of server components
+- Successful connection to MongoDB
+- Server listening on a network port (default: 3000)
+
+Example snippet:
+
+```
+Uwazi server started on port 3000
+Connected to MongoDB at mongodb://localhost:27017/uwazi
+```
+</Step>
+</Steps>
+
+## Validating the Server Is Running
+
+After startup, verification is key before further configuration or use:
+
+- Open your web browser and navigate to `http://localhost:3000` (or your configured domain/port).
+- You should see the Uwazi web interface homepage load.
+
+Alternatively, you can check basic API responsiveness via curl:
+
+```bash
+curl -i http://localhost:3000/api
+```
+
+A healthy server responds with status `200 OK` and JSON metadata indicating the API is live.
+
+<Tip>
+If your server doesn’t respond or you get connection errors:
+
+- Verify MongoDB is running and accessible.
+- Confirm your environment variables or configuration files have correct database connection info.
+- Check for port conflicts or firewall restrictions.
+</Tip>
+
+## What to Expect and Common Pitfalls
+
+The startup output is your primary feedback:
+
+- **Missing Database Connection:** Look for errors mentioning MongoDB connection failures.
+- **Port Already in Use:** Errors will indicate the chosen port is occupied.
+- **Configuration Errors:** Invalid or missing env vars show up as startup warnings or failures.
+
+Resolving these is often a matter of revisiting your setup or environment.
+
+<Warning>
+Don’t ignore errors in the startup logs — the server may appear running but won’t respond correctly without a healthy DB connection.
+</Warning>
+
+## Next Steps
+
+Once the server runs and responds:
+
+- Proceed to [Authentication & Authorization](/overview/core_concepts/authentication_overview) to secure your instance.
+- Customize your settings via [Settings & Configuration Concepts](/overview/core_concepts/settings_and_configuration).
+- If you hit issues, see [Troubleshooting Common Setup Issues](/getting-started/uwazi-setup-essentials/troubleshooting-common-setup-issues).
+
+<Source url="https://github.com/huridocs/uwazi" paths={[{"path": "package.json", "range": "10-25"},{"path": "app/server.js", "range": "1-50"}]} />
