@@ -1,0 +1,90 @@
+---
+title: "Error Handling & Status Codes"
+description: "Explanation of Uwazi's error response structures, standard HTTP status codes used, and tips on interpreting and handling common errors in client applications."
+---
+
+## Understanding Error Responses and HTTP Status Codes in Uwazi API
+
+When integrating with Uwazi's API, you will inevitably encounter error responses. These responses follow consistent structures and use standard HTTP status codes to indicate what went wrong. Understanding how to interpret these errors will help you quickly diagnose issues and ensure your client handles failures gracefully.
+
+### How Error Responses Are Structured
+
+Uwazi API error responses are sent as JSON objects containing a few key fields:
+
+- `message`: A concise error description intended for debugging.
+- `error`: An optional error code or string identifier representing the failure type.
+- `details`: Occasionally included, this provides additional context or validation errors.
+
+This structure helps you programmatically access the error cause and display meaningful information to your users or log it for troubleshooting.
+
+#### Typical Error Response Example
+```json
+{
+  "error": "ValidationError",
+  "message": "The property 'title' is required.",
+  "details": {
+    "title": "Missing required field"
+  }
+}
+```
+
+Keep in mind, `details` are more common with form or schema validation failures and might be absent for authentication or permission errors.
+
+### Common HTTP Status Codes You’ll Encounter
+
+Uwazi sticks to standard HTTP status codes to signal different failure modes. Here are the ones you need to know:
+
+- **400 Bad Request**: The request you sent is malformed or fails validation. Expect `ValidationError` messages here.
+- **401 Unauthorized**: Authentication failed or missing. You need a valid token or session.
+- **403 Forbidden**: You’re authenticated but don’t have permission for the resource or action.
+- **404 Not Found**: The specified resource ID or URL endpoint does not exist.
+- **409 Conflict**: The request conflicts with the current state (e.g., duplicate entries).
+- **429 Too Many Requests**: You exceeded rate limits; slow down your requests.
+- **500 Internal Server Error**: Something went wrong on the server side; these should be rare.
+
+### Handling Errors in Your Client Application
+
+Proper error handling relies on differentiating what kind of error occurred to respond appropriately:
+
+- **Validation issues (400)**: Highlight input mistakes to users before retrying.
+- **Auth problems (401, 403)**: Check token expiration or permissions and prompt login or token refresh.
+- **Resource not found (404)**: Verify resource identifiers before requests.
+- **Rate limiting (429)**: Implement retry-after logic with exponential backoff.
+- **Server errors (500)**: Log and alert but avoid automatic retries without changes.
+
+#### Example: Handling a 401 Unauthorized Error with curl
+```bash
+curl -H "Authorization: Bearer invalid_token" https://api.uwazi.io/documents
+```
+Response:
+```json
+{
+  "error": "Unauthorized",
+  "message": "Invalid or expired token."
+}
+```
+Your client should detect this and prompt for re-authentication.
+
+### Practical Tips & Common Pitfalls
+
+- Always check the HTTP status code before parsing the response body.
+- Don’t rely solely on the `message` text for logic since wording might change.
+- Validate user inputs proactively to reduce server-side validation errors.
+- Use the `details` field when present to show specific info about form errors.
+- Monitor for `429` responses to avoid being blocked due to excessive requests.
+
+### Summary
+
+Error handling in Uwazi’s API is straightforward but crucial. You’ll deal mostly with standard HTTP codes paired with JSON error responses that specify the cause clearly. Plan your client logic to handle these scenarios gracefully, giving users clear feedback and avoiding unnecessary retries.
+
+For implementation details of the error response format, see the core middleware handling in the API codebase. <Source url="https://github.com/huridocs/uwazi" paths={[{"path": "app/api/middleware/errorHandler.ts", "range": "1-70"}]} />
+
+---
+
+### Related Documentation
+
+- [Authentication & Authorization Mechanisms](/api_reference/api_infrastructure/authentication_mechanisms) — learn how to properly authenticate and avoid 401 / 403 errors
+- [API Middleware & Rate Limiting](/api_reference/api_infrastructure/api_middleware_and_rate_limiting) — understand throttling to handle 429 errors effectively
+- [Document Management APIs](/api_reference/core_apis/document_management_apis) — get familiar with endpoints where you might encounter resource-related errors
+
+Keep this page bookmarked as a quick reference whenever you troubleshoot or build Uwazi API integrations.
